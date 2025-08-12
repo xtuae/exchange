@@ -107,7 +107,7 @@ function App() {
         payload.toAmount = parseFloat(formData.amount);
       }
 
-      const response = await axios.post('/api/session', payload, {
+      const response = await axios.post('https://instaxchange.com/api/session', payload, {
         headers: {
           'Content-Type': 'application/json'
         }
