@@ -1,70 +1,203 @@
-# Getting Started with Create React App
+# NILA Token Purchase App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React application that allows users to buy NILA tokens using USD through the Instaxchange API. Built with MindWaveDAO branding and integrated with Vercel Postgres for transaction tracking.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Buy NILA Tokens with USD**: Simple interface to purchase NILA tokens
+- **Real-time Price Display**: Shows current NILA token price from CoinGecko
+- **Automatic NILA Calculation**: Displays how many NILA tokens users will receive
+- **User Information Collection**: Captures name, email, and phone for transaction records
+- **Database Integration**: Stores all transactions in Vercel Postgres
+- **Webhook Support**: Automatically updates transaction status via Instaxchange webhooks
+- **Secure Payment Processing**: Integration with Instaxchange's secure payment gateway
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
+- **MindWaveDAO Themed**: Dark theme with purple accents matching the brand
 
-### `npm start`
+## Prerequisites
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- Node.js (v14 or higher)
+- npm or yarn
+- A valid Instaxchange account with the provided Account Reference ID
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Installation
 
-### `npm test`
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd usdc-exchange-app
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+2. Install dependencies:
+```bash
+npm install
+```
 
-### `npm run build`
+## Configuration
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Required Configuration
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. **Account Reference ID**: Pre-configured as `dfkvch5vrd0d57sowjqnt17y`
+2. **USDC Wallet Address**: Pre-configured as `0x6B992443ead5c751df1dDBBd35DD1E7b3f319B36`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Environment Variables
 
-### `npm run eject`
+Create a `.env.local` file in the root directory with the following variables:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```env
+# Vercel Postgres Database
+POSTGRES_URL=your_postgres_url
+POSTGRES_PRISMA_URL=your_postgres_prisma_url
+POSTGRES_URL_NON_POOLING=your_postgres_url_non_pooling
+POSTGRES_USER=your_postgres_user
+POSTGRES_HOST=your_postgres_host
+POSTGRES_PASSWORD=your_postgres_password
+POSTGRES_DATABASE=your_postgres_database
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+# Instaxchange Webhook Secret (optional but recommended)
+INSTAXCHANGE_WEBHOOK_SECRET=your_webhook_secret
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Running the Application
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Development Mode
 
-## Learn More
+```bash
+npm start
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+This will start the development server on [http://localhost:3000](http://localhost:3000).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Production Build
 
-### Code Splitting
+```bash
+npm run build
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+This creates an optimized production build in the `build` folder.
 
-### Analyzing the Bundle Size
+## How to Use
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+1. **Enter Personal Information**: Provide your name, email, and phone number
 
-### Making a Progressive Web App
+2. **Enter USD Amount**: Specify how much USD you want to spend
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+3. **View NILA Amount**: See real-time calculation of NILA tokens you'll receive
 
-### Advanced Configuration
+4. **Continue to Payment**: Click the button to create a payment session
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+5. **Complete Payment**: Use the embedded Instaxchange payment form
 
-### Deployment
+6. **Transaction Recorded**: Your transaction is saved to the database
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+7. **Receive NILA Tokens**: Tokens will be distributed from the MindWaveDAO wallet
 
-### `npm run build` fails to minify
+## API Integration
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### External APIs
+
+- **Instaxchange API**: 
+  - Session Creation: `POST https://instaxchange.com/api/session`
+  - Payment Processing: Via embedded iframe
+  
+- **CoinGecko API**: 
+  - NILA Price: `GET https://api.coingecko.com/api/v3/simple/price?ids=mindwavedao&vs_currencies=usd`
+
+### Internal API Endpoints
+
+- **Save Transaction**: `POST /api/save-transaction`
+  - Saves transaction details to Vercel Postgres
+  
+- **Webhook Handler**: `POST /api/webhook`
+  - Receives payment status updates from Instaxchange
+
+## Deployment to Vercel
+
+1. **Fork/Clone the Repository**
+
+2. **Install Vercel CLI** (if not already installed)
+```bash
+npm i -g vercel
+```
+
+3. **Login to Vercel**
+```bash
+vercel login
+```
+
+4. **Deploy the Application**
+```bash
+vercel
+```
+
+5. **Set up Vercel Postgres**
+   - Go to your Vercel dashboard
+   - Navigate to the Storage tab
+   - Create a new Postgres database
+   - Copy the environment variables to your project
+
+6. **Configure Environment Variables**
+   - In Vercel dashboard, go to Settings > Environment Variables
+   - Add all the required environment variables from `.env.example`
+
+7. **Configure Webhook in Instaxchange**
+   - Log into your Instaxchange dashboard
+   - Set webhook URL to: `https://your-app.vercel.app/api/webhook`
+   - Copy the webhook secret and add it to Vercel environment variables
+
+8. **Deploy to Production**
+```bash
+vercel --prod
+```
+
+## Database Schema
+
+The application automatically creates the following table:
+
+```sql
+CREATE TABLE nila_transactions (
+  id SERIAL PRIMARY KEY,
+  session_id VARCHAR(255) UNIQUE NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  phone VARCHAR(50) NOT NULL,
+  usd_amount DECIMAL(10, 2) NOT NULL,
+  nila_amount DECIMAL(18, 8) NOT NULL,
+  wallet_address VARCHAR(255) NOT NULL,
+  status VARCHAR(50) DEFAULT 'pending',
+  deposit_status VARCHAR(50),
+  withdraw_status VARCHAR(50),
+  withdraw_tx_id VARCHAR(255),
+  webhook_data JSONB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+## Security Notes
+
+- Always verify your wallet address before submitting
+- The application uses HTTPS for all API communications
+- Payment processing is handled securely by Instaxchange
+- Never share your session IDs or sensitive payment information
+
+## Troubleshooting
+
+### CORS Issues
+The application includes a proxy configuration for development. If you encounter CORS issues in production, ensure your domain is whitelisted in your Instaxchange account settings.
+
+### Payment Session Errors
+- Verify your Account Reference ID is correct
+- Ensure you're providing a valid wallet address
+- Check that the amount is within Instaxchange's allowed limits
+
+## Support
+
+For issues related to:
+- **Application**: Check the console for error messages and ensure all fields are filled correctly
+- **Instaxchange API**: Refer to [Instaxchange documentation](https://instaxchange.com/iframe-session.html)
+- **Payments**: Contact Instaxchange support
+
+## License
+
+This project is created for demonstration purposes. Please ensure you comply with all relevant financial regulations in your jurisdiction when using cryptocurrency exchange services.
