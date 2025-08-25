@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     <div style="background: radial-gradient(ellipse at center top, rgba(138, 43, 226, 0.15) 0%, transparent 50%),
                 radial-gradient(ellipse at center bottom, rgba(138, 43, 226, 0.1) 0%, transparent 50%); padding: 20px;">
       <div style="text-align: center; padding: 20px;">
-        <img src="https://exchange-dun.vercel.app/mindwave-logo.webp" alt="MindWaveDAO Logo" style="width: 100px; height: auto; filter: drop-shadow(0 0 20px rgba(138, 43, 226, 0.5));" />
+        <img src="https://exchange-dun.vercel.app/mindwave-logo.webp" alt="MindWaveDAO Logo" style="width: 150px; height: auto; filter: drop-shadow(0 0 20px rgba(138, 43, 226, 0.5));" />
       </div>
       <div style="background: rgba(20, 20, 20, 0.8); border: 1px solid rgba(138, 43, 226, 0.3); border-radius: 20px; padding: 2.5rem; max-width: 500px; margin: auto;">
         <h2 style="text-align: center; font-size: 2.5rem; font-weight: 700; background: linear-gradient(135deg, #ffffff 0%, #b794f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Transaction Successful!</h2>
