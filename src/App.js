@@ -16,13 +16,26 @@ function App() {
   const [showIframe, setShowIframe] = useState(false);
   const [nilaPrice, setNilaPrice] = useState(null);
   const [nilaAmount, setNilaAmount] = useState(0);
+  const [transactionComplete, setTransactionComplete] = useState(false);
 
   const ACCOUNT_REF_ID = 'dfkvch5vrd0d57sowjqnt17y';
   const FIXED_WALLET_ADDRESS = '0x6B992443ead5c751df1dDBBd35DD1E7b3f319B36';
 
-  // Fetch NILA token price on component mount
+  // Fetch NILA token price on component mount and check for completed transaction
   useEffect(() => {
     fetchNilaPrice();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('payment_status') === 'completed') {
+      const savedTransaction = localStorage.getItem('nila_transaction');
+      if (savedTransaction) {
+        const { savedFormData, savedNilaAmount } = JSON.parse(savedTransaction);
+        setFormData(savedFormData);
+        setNilaAmount(savedNilaAmount);
+        setTransactionComplete(true);
+        localStorage.removeItem('nila_transaction');
+      }
+    }
   }, []);
 
   // Calculate NILA amount when USD amount changes
@@ -99,7 +112,7 @@ function App() {
         amountDirection: formData.amountDirection,
         method: 'card',
         webhookRef: `whref-${Date.now()}`,
-        returnUrl: window.location.href
+        returnUrl: `${window.location.origin}?payment_status=completed`
       };
 
       // Add amount based on direction
@@ -116,6 +129,12 @@ function App() {
       });
 
       if (response.data && response.data.id) {
+        const transactionData = {
+          savedFormData: formData,
+          savedNilaAmount: nilaAmount
+        };
+        localStorage.setItem('nila_transaction', JSON.stringify(transactionData));
+
         setSessionId(response.data.id);
         
         // Save transaction data to database
@@ -176,7 +195,37 @@ function App() {
     setShowIframe(false);
     setError(null);
     setNilaAmount(0);
+    setTransactionComplete(false);
   };
+
+  if (transactionComplete) {
+    return (
+      <div className="App">
+        <header className="App-header">
+          <img src="/mindwave-logo.webp" alt="MindWaveDAO" className="logo" />
+          <h1>Transaction Successful</h1>
+          <p className="subtitle">Thank you for your purchase!</p>
+        </header>
+        <main className="App-main">
+          <div className="transaction-summary-container">
+            <h3>Your Transaction Details</h3>
+            <div className="transaction-summary">
+              <p><strong>Name:</strong> {formData.name}</p>
+              <p><strong>Email:</strong> {formData.email}</p>
+              <p><strong>USD Amount:</strong> ${formData.amount}</p>
+              <p><strong>NILA Tokens Received:</strong> {nilaAmount.toFixed(2)} NILA</p>
+            </div>
+            <p className="wallet-note">
+              <small>Your NILA tokens will be distributed to the designated wallet shortly.</small>
+            </p>
+            <button onClick={resetForm} className="submit-button">
+              Start New Transaction
+            </button>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="App">
