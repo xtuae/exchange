@@ -33,6 +33,7 @@ function App() {
         setFormData(savedFormData);
         setNilaAmount(savedNilaAmount);
         setTransactionComplete(true);
+        sendConfirmationEmail(savedFormData, savedNilaAmount);
         localStorage.removeItem('nila_transaction');
       }
     }
@@ -96,6 +97,20 @@ function App() {
     } catch (err) {
       console.error('Error saving to database:', err);
       // Continue with payment even if database save fails
+    }
+  };
+
+  const sendConfirmationEmail = async (transactionData, nilaAmountData) => {
+    try {
+      await axios.post('/api/send-email', {
+        name: transactionData.name,
+        email: transactionData.email,
+        usdAmount: transactionData.amount,
+        nilaAmount: nilaAmountData,
+      });
+    } catch (err) {
+      console.error('Error sending confirmation email:', err);
+      // Don't block the user flow if email fails
     }
   };
 

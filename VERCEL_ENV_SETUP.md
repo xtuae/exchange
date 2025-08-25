@@ -38,6 +38,16 @@ POSTGRES_PRISMA_URL = postgres://neondb_owner:npg_sV9NAcHX1Wnt@ep-billowing-thun
 INSTAXCHANGE_WEBHOOK_SECRET = 83yfj8SBqQFuWeXrAonaR6DhheHhbwDr
 ```
 
+### SMTP Configuration for Emails
+```
+SMTP_HOST = your_smtp_host
+SMTP_PORT = your_smtp_port
+SMTP_SECURE = true
+SMTP_USER = your_smtp_username
+SMTP_PASS = your_smtp_password
+SMTP_FROM_EMAIL = your_from_email_address
+```
+
 4. **Select Environment Scope**
    - Check: ✅ Production
    - Check: ✅ Preview
