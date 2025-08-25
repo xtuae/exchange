@@ -22,6 +22,13 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
+    const parsedUsdAmount = parseFloat(usdAmount);
+    const parsedNilaAmount = parseFloat(nilaAmount);
+
+    if (isNaN(parsedUsdAmount) || isNaN(parsedNilaAmount)) {
+      return res.status(400).json({ error: 'Invalid amount format' });
+    }
+
     // Create table if it doesn't exist
     await sql`
       CREATE TABLE IF NOT EXISTS nila_transactions (
@@ -55,8 +62,8 @@ export default async function handler(req, res) {
         ${name},
         ${email},
         ${phone},
-        ${usdAmount},
-        ${nilaAmount},
+        ${parsedUsdAmount},
+        ${parsedNilaAmount},
         ${walletAddress},
         ${timestamp || new Date().toISOString()}
       )
