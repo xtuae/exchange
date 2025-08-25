@@ -10,7 +10,7 @@ function App() {
     phone: '',
     amountDirection: 'sending'
   });
-  const [sessionId, setSessionId] = useState(null);
+  const [sessionId, setSessionId] = useState(null); // This will now store the 'id' from the API response
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showIframe, setShowIframe] = useState(false);
@@ -71,7 +71,7 @@ function App() {
       // This will be called after successful payment session creation
       // You'll need to set up an API endpoint to handle this
       await axios.post('/api/save-transaction', {
-        sessionId: sessionData.sessionId,
+        sessionId: sessionData.id, // Use .id here
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
@@ -97,7 +97,9 @@ function App() {
         toCurrency: 'USDC',
         address: FIXED_WALLET_ADDRESS,
         amountDirection: formData.amountDirection,
-        method: 'card'
+        method: 'card',
+        webhookRef: `whref-${Date.now()}`,
+        returnUrl: window.location.href
       };
 
       // Add amount based on direction
@@ -107,25 +109,29 @@ function App() {
         payload.toAmount = parseFloat(formData.amount);
       }
 
-      const response = await axios.post('https://instaxchange.com/api/session', payload, {
+      const response = await axios.post('/api/session', payload, {
         headers: {
           'Content-Type': 'application/json'
         }
       });
 
-      if (response.data && response.data.sessionId) {
-        setSessionId(response.data.sessionId);
+      if (response.data && response.data.id) {
+        setSessionId(response.data.id);
         
         // Save transaction data to database
         await saveToDatabase(response.data);
         
         setShowIframe(true);
       } else {
-        throw new Error('No session ID received');
+        setError(`API response missing session ID. Response: ${JSON.stringify(response.data)}`);
       }
     } catch (err) {
       console.error('Error creating session:', err);
-      setError(err.response?.data?.message || err.message || 'Failed to create payment session');
+      let errorDetails = err.message;
+      if (err.response) {
+        errorDetails = `Status: ${err.response.status}. Body: ${JSON.stringify(err.response.data)}`;
+      }
+      setError(`Failed to create payment session. ${errorDetails}`);
     } finally {
       setLoading(false);
     }
