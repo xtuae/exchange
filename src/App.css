@@ -378,6 +378,73 @@ select.form-control option {
   font-size: 0.95rem;
 }
 
+/* Iframe Error and Loading States */
+.iframe-error-container {
+  padding: 2rem;
+  text-align: center;
+}
+
+.fallback-options {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: rgba(30, 30, 30, 0.6);
+  border-radius: 10px;
+  border: 1px solid rgba(138, 43, 226, 0.2);
+}
+
+.fallback-options h3 {
+  color: #b794f6;
+  margin-bottom: 1.5rem;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.fallback-options .submit-button {
+  margin: 1rem 0;
+}
+
+.submit-button.secondary {
+  background: transparent;
+  border: 2px solid #8a2be2;
+  color: #b794f6;
+}
+
+.submit-button.secondary:hover {
+  background: #8a2be2;
+  color: white;
+}
+
+.info-text {
+  margin: 1.5rem 0;
+  color: #e2e8f0;
+  font-size: 0.95rem;
+}
+
+.iframe-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(20, 20, 20, 0.9);
+  padding: 2rem;
+  border-radius: 10px;
+  border: 1px solid rgba(138, 43, 226, 0.3);
+  z-index: 10;
+}
+
+.iframe-loading p {
+  color: #b794f6;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.help-text {
+  margin-top: 1rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 10px;

@@ -17,6 +17,8 @@ function App() {
   const [nilaPrice, setNilaPrice] = useState(null);
   const [nilaAmount, setNilaAmount] = useState(0);
   const [transactionComplete, setTransactionComplete] = useState(false);
+  const [iframeLoading, setIframeLoading] = useState(false);
+  const [iframeError, setIframeError] = useState(false);
 
   const ACCOUNT_REF_ID = 'dfkvch5vrd0d57sowjqnt17y';
   const FIXED_WALLET_ADDRESS = '0x6B992443ead5c751df1dDBBd35DD1E7b3f319B36';
@@ -38,6 +40,56 @@ function App() {
       }
     }
   }, []);
+
+  // Listen for messages from the iframe
+  useEffect(() => {
+    const handleMessage = (event) => {
+      // Verify the message is from Instaxchange
+      if (event.origin !== 'https://instaxchange.com') return;
+      
+      console.log('Received message from iframe:', event.data);
+      
+      // Handle different message types
+      if (event.data.type === 'payment_complete') {
+        const savedTransaction = localStorage.getItem('nila_transaction');
+        if (savedTransaction) {
+          const { savedFormData, savedNilaAmount } = JSON.parse(savedTransaction);
+          setFormData(savedFormData);
+          setNilaAmount(savedNilaAmount);
+          setTransactionComplete(true);
+          sendConfirmationEmail(savedFormData, savedNilaAmount);
+          localStorage.removeItem('nila_transaction');
+        }
+      } else if (event.data.type === 'payment_error') {
+        setIframeError(true);
+        setError('Payment failed. Please try again.');
+      } else if (event.data.type === 'identity_verification_required') {
+        // Handle identity verification
+        console.log('Identity verification required');
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  // Set iframe loading timeout
+  useEffect(() => {
+    if (showIframe && sessionId) {
+      setIframeLoading(true);
+      setIframeError(false);
+      
+      // Set a timeout to detect if iframe is stuck
+      const timeout = setTimeout(() => {
+        if (iframeLoading) {
+          console.log('Iframe loading timeout - may be stuck on redirect');
+          setIframeError(true);
+        }
+      }, 15000); // 15 seconds timeout
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [showIframe, sessionId]);
 
   // Calculate NILA amount when USD amount changes
   useEffect(() => {
@@ -373,18 +425,81 @@ function App() {
               <p><strong>NILA Tokens:</strong> {nilaAmount.toFixed(2)} NILA</p>
             </div>
             
-            <iframe
-              title="Instaxchange Payment Gateway"
-              src={`https://instaxchange.com/embed/${sessionId}`}
-              allow="clipboard-read; clipboard-write; fullscreen; payment"
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-              referrerPolicy="strict-origin-when-cross-origin"
-              style={{ width: '100%', height: '700px', border: 'none' }}
-            />
+            {iframeError ? (
+              <div className="iframe-error-container">
+                <div className="error-message">
+                  <p><strong>Payment Gateway Issue Detected</strong></p>
+                  <p>The payment iframe appears to be stuck or requires identity verification.</p>
+                </div>
+                <div className="fallback-options">
+                  <h3>Alternative Options:</h3>
+                  <button 
+                    onClick={() => {
+                      window.open(`https://instaxchange.com/order/${sessionId}`, '_blank');
+                    }}
+                    className="submit-button"
+                  >
+                    Open Payment in New Tab
+                  </button>
+                  <p className="info-text">
+                    Complete the payment in the new tab, then return here and click below when done:
+                  </p>
+                  <button 
+                    onClick={() => {
+                      // Check payment status manually
+                      window.location.href = `${window.location.origin}?payment_status=completed`;
+                    }}
+                    className="submit-button secondary"
+                  >
+                    I've Completed Payment
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setIframeError(false);
+                      setIframeLoading(true);
+                    }}
+                    className="submit-button secondary"
+                  >
+                    Retry Loading Iframe
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <iframe
+                  title="Instaxchange Payment Gateway"
+                  src={`https://instaxchange.com/embed/${sessionId}`}
+                  allow="clipboard-read; clipboard-write; fullscreen; payment"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation allow-modals"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  style={{ width: '100%', height: '700px', border: 'none' }}
+                  onLoad={() => {
+                    setIframeLoading(false);
+                    console.log('Iframe loaded successfully');
+                  }}
+                  onError={() => {
+                    setIframeError(true);
+                    setIframeLoading(false);
+                    console.error('Iframe failed to load');
+                  }}
+                />
+                
+                {iframeLoading && (
+                  <div className="iframe-loading">
+                    <p>Loading payment gateway...</p>
+                  </div>
+                )}
+              </>
+            )}
             
             <div className="iframe-info">
               <p>Complete your payment in the secure Instaxchange window above.</p>
               <p>Session ID: {sessionId}</p>
+              {!iframeError && (
+                <p className="help-text">
+                  <small>If the payment window is stuck on "Redirecting", click the "Open Payment in New Tab" option above.</small>
+                </p>
+              )}
             </div>
           </div>
         )}
