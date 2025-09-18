@@ -375,9 +375,10 @@ function App() {
             
             <iframe
               src={`https://instaxchange.com/embed/${sessionId}`}
-              title="Instaxchange Payment"
-              className="payment-iframe"
-              allow="payment"
+              allow="clipboard-read; clipboard-write; fullscreen; payment"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+              referrerpolicy="strict-origin-when-cross-origin"
+              style="width: 100%; height: 100%; border: none;"
             />
             
             <div className="iframe-info">
