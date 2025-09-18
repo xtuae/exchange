@@ -85,7 +85,7 @@ function App() {
           console.log('Iframe loading timeout - may be stuck on redirect');
           setIframeError(true);
         }
-      }, 15000); // 15 seconds timeout
+      }, 8000); // 8 seconds timeout - reduced for better UX
       
       return () => clearTimeout(timeout);
     }
@@ -470,7 +470,7 @@ function App() {
                   title="Instaxchange Payment Gateway"
                   src={`https://instaxchange.com/embed/${sessionId}`}
                   allow="clipboard-read; clipboard-write; fullscreen; payment"
-                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation allow-modals"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation allow-modals"
                   referrerPolicy="strict-origin-when-cross-origin"
                   style={{ width: '100%', height: '700px', border: 'none' }}
                   onLoad={() => {
