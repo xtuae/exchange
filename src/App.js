@@ -44,8 +44,9 @@ function App() {
   // Listen for messages from the iframe
   useEffect(() => {
     const handleMessage = (event) => {
-      // Verify the message is from Instaxchange
-      if (event.origin !== 'https://instaxchange.com') return;
+      // Verify the message is from Instaxchange or Banxa
+      if (event.origin !== 'https://instaxchange.com' && 
+          event.origin !== 'https://instaxchange.banxa.com') return;
       
       console.log('Received message from iframe:', event.data);
       
@@ -60,12 +61,14 @@ function App() {
           sendConfirmationEmail(savedFormData, savedNilaAmount);
           localStorage.removeItem('nila_transaction');
         }
-      } else if (event.data.type === 'payment_error') {
+      } else if (event.data.type === 'payment_error' || event.data.code === '227') {
         setIframeError(true);
-        setError('Payment failed. Please try again.');
+        setError('Payment cannot be processed. Instaxchange is unable to verify this transaction due to compliance requirements.');
       } else if (event.data.type === 'identity_verification_required') {
         // Handle identity verification
         console.log('Identity verification required');
+        setIframeError(true);
+        setError('Identity verification is required. Please use the "Open Payment in New Tab" option to complete verification.');
       }
     };
 
