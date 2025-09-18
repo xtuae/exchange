@@ -374,11 +374,12 @@ function App() {
             </div>
             
             <iframe
+              title="Instaxchange Payment Gateway"
               src={`https://instaxchange.com/embed/${sessionId}`}
               allow="clipboard-read; clipboard-write; fullscreen; payment"
               sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-              referrerpolicy="strict-origin-when-cross-origin"
-              style="width: 100%; height: 100%; border: none;"
+              referrerPolicy="strict-origin-when-cross-origin"
+              style={{ width: '100%', height: '700px', border: 'none' }}
             />
             
             <div className="iframe-info">
